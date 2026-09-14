@@ -1,0 +1,350 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Bereken &amp; betaal — BioGroen Boskoop</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232B4220'/%3E%3Cpath d='M18 46 C20 26 32 14 48 12 C50 30 38 44 18 46 Z' fill='%23A8C63C'/%3E%3Cpath d='M19 46 C26 38 36 26 46 15' stroke='%232B4220' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="bgb-fonts.css">
+<style>
+
+:root{
+  --lime:#A8C63C; --pastel:#D9E4BC; --mid:#6E9444; --dark:#3E5C2E; --night:#2B4220;
+  --moss:#4E6E2E; --cream:#F3EFE5; --line:#DCD5C2; --terra:#9A4419;
+  --f:Nunito,system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+html{font-family:var(--f)}
+body{margin:0;background:var(--cream);color:var(--night);font-family:var(--f);
+  font-weight:400;font-size:17px;line-height:1.55;-webkit-font-smoothing:antialiased}
+.wrap{max-width:560px;margin:0 auto;padding:0 18px 40px}
+a{color:inherit}
+.lbl{font-weight:600;letter-spacing:.12em;text-transform:uppercase;font-size:12px}
+.num{font-variant-numeric:tabular-nums;font-feature-settings:"tnum"}
+.skip{position:absolute;left:-9999px}
+.skip:focus{left:12px;top:12px;min-height:44px;display:inline-flex;align-items:center;
+  padding:0 16px;background:var(--night);color:var(--cream);border-radius:10px;z-index:9}
+
+.kop{background:var(--night);padding:14px 18px;display:flex;align-items:center;
+  justify-content:space-between;gap:14px}
+.kop .bgb-logo__plaats{fill:var(--cream)}
+.kop__merk{width:118px;display:block}
+.kop__adres{color:var(--lime);text-align:right;margin:0;line-height:1.5}
+
+.top{background:var(--pastel);padding:26px 0 24px;margin-bottom:24px}
+h1{font-weight:800;font-size:clamp(30px,8vw,40px);line-height:1.06;letter-spacing:-.015em;margin:0 0 8px}
+h1 em{font-style:italic;color:var(--dark)}
+.lead{margin:0;color:var(--dark)}
+.staffel{display:flex;gap:10px;margin:16px 0 0;flex-wrap:wrap}
+.staffel__kaart{flex:1 1 150px;background:var(--cream);border-radius:12px;padding:11px 13px}
+.staffel__prijs{font-weight:800;font-size:24px;line-height:1.1;margin:0}
+.staffel__wat{margin:2px 0 0;color:var(--moss);font-size:13px}
+
+.teller{background:#FBF9F3;border:1.5px solid var(--line);border-radius:16px;padding:18px 16px 16px;text-align:center}
+.teller__label{margin:0 0 12px;color:var(--moss)}
+.teller__rij{display:flex;align-items:center;justify-content:center;gap:12px}
+.teller__knop{width:64px;height:64px;border:2px solid var(--night);background:#FBF9F3;color:var(--night);
+  border-radius:16px;font-size:32px;font-weight:800;line-height:1;cursor:pointer;display:grid;
+  place-items:center;padding:0;font-family:var(--f)}
+.teller__knop:hover:not(:disabled){background:var(--lime)}
+.teller__knop:disabled{opacity:.3;cursor:default}
+.teller__veld{width:124px;height:64px;text-align:center;font-size:38px;font-weight:800;font-family:var(--f);
+  border:2px solid var(--line);border-radius:16px;background:#fff;color:var(--night);
+  -moz-appearance:textfield;font-variant-numeric:tabular-nums}
+.teller__veld::-webkit-outer-spin-button,.teller__veld::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.teller__snel{display:flex;gap:8px;justify-content:center;margin:14px 0 0;flex-wrap:wrap}
+.teller__snel button{min-width:56px;min-height:44px;padding:0 14px;border:1.5px solid var(--line);
+  background:var(--cream);color:var(--dark);border-radius:11px;font-family:var(--f);font-weight:600;
+  font-size:15px;cursor:pointer;font-variant-numeric:tabular-nums}
+.teller__snel button:hover{border-color:var(--night);background:var(--pastel)}
+
+.meter{margin:18px 0 0;background:#FBF9F3;border:1.5px solid var(--line);border-radius:14px;padding:14px 15px}
+.meter__tekst{margin:0 0 9px;font-size:14.5px;color:var(--dark)}
+.meter__tekst b{color:var(--terra);font-weight:800}
+.meter__baan{height:10px;background:var(--line);border-radius:999px;overflow:hidden}
+.meter__vul{height:100%;background:var(--lime);border-radius:999px;width:0}
+.meter--bereikt .meter__vul{background:var(--mid)}
+
+.totaal{margin-top:20px;background:var(--night);color:var(--cream);border-radius:16px;padding:18px}
+.totaal__rij{display:flex;justify-content:space-between;gap:12px;font-size:14.5px;padding:5px 0}
+.totaal__rij--korting{color:var(--lime)}
+.totaal__hoofd{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:10px;
+  padding-top:12px;border-top:1.5px solid rgba(243,239,229,.28)}
+.totaal__label{font-weight:800;font-size:20px}
+.totaal__bedrag{font-weight:800;font-size:34px;letter-spacing:-.01em}
+.knop{display:flex;align-items:center;justify-content:center;width:100%;min-height:56px;margin-top:16px;
+  background:var(--lime);color:var(--night);border:none;border-radius:13px;font-family:var(--f);
+  font-weight:800;font-size:19px;cursor:pointer}
+.knop:hover:not(:disabled){background:#B7D451}
+.knop:disabled{opacity:.4;cursor:default}
+.leeg{font-size:13px;color:#C9D8A0;margin:12px 0 0;text-align:center}
+.hint{margin:12px 0 0;padding:11px 13px;background:rgba(168,198,60,.16);color:#DDEBAF;
+  border-radius:11px;font-size:14px;line-height:1.45;text-align:center}
+.hint b{color:#fff;font-weight:800;font-variant-numeric:tabular-nums}
+.knop--ok{background:#6E9444;color:#F3EFE5}
+
+.uitleg{margin:20px 0 0;padding:14px 16px;border:1.5px dashed var(--moss);border-radius:13px;
+  font-size:14px;line-height:1.5;color:var(--dark)}
+.uitleg b{font-weight:800;color:var(--night)}
+.voet{margin-top:26px;padding-top:18px;border-top:1px solid var(--line);font-size:14px;color:var(--moss)}
+.voet__gegevens{line-height:1.65;margin:6px 0 0;font-size:13.5px}
+.voet__gegevens a{display:inline-flex;align-items:center;min-height:44px;padding:0 2px;
+  text-decoration-thickness:1px;text-underline-offset:3px}
+:focus-visible{outline:3px solid var(--terra);outline-offset:2px}
+</style>
+</head>
+<body>
+<a class="skip" href="#rekenen">Naar de rekenmodule</a>
+
+<header class="kop">
+  <!-- LOGO:START -->
+  <svg class="kop__merk bgb-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 430" role="img" aria-label="BioGroen Boskoop">
+  <defs>
+    <linearGradient id="bgbLime" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#A8C63C"/><stop offset="34%" stop-color="#A3C33C"/>
+      <stop offset="58%" stop-color="#87AC40"/><stop offset="100%" stop-color="#6E9444"/>
+    </linearGradient>
+    <linearGradient id="bgbLeaf" x1="0" y1="1" x2="1" y2="0">
+      <stop offset="0%" stop-color="#4C862C"/><stop offset="55%" stop-color="#62A034"/>
+      <stop offset="100%" stop-color="#8ABF45"/>
+    </linearGradient>
+  </defs>
+  <g font-family="Nunito, system-ui, sans-serif" font-weight="800" text-anchor="middle">
+    <text y="228" font-size="228" fill="url(#bgbLime)">
+      <tspan x="120" textLength="140" lengthAdjust="spacingAndGlyphs">B</tspan><tspan x="219" textLength="42" lengthAdjust="spacingAndGlyphs">i</tspan><tspan x="296" textLength="132" lengthAdjust="spacingAndGlyphs">o</tspan><tspan x="446" textLength="162" lengthAdjust="spacingAndGlyphs">G</tspan><tspan x="576" textLength="88" lengthAdjust="spacingAndGlyphs">r</tspan><tspan x="676" textLength="132" lengthAdjust="spacingAndGlyphs">o</tspan><tspan x="806" textLength="128" lengthAdjust="spacingAndGlyphs">e</tspan><tspan x="936" textLength="130" lengthAdjust="spacingAndGlyphs">n</tspan>
+    </text>
+    <text class="bgb-logo__plaats" x="520" y="412" font-size="228" fill="#3E5C2E" textLength="948" lengthAdjust="spacingAndGlyphs">Boskoop</text>
+  </g>
+  <g transform="translate(225,92) rotate(-3) scale(1.34)">
+    <path d="M0,0 C3,-42 25,-77 61,-99 C68,-58 48,-16 0,0 Z" fill="url(#bgbLeaf)"/>
+    <path d="M2,-5 C18,-33 39,-63 58,-95" stroke="#BEDD72" stroke-width="4" fill="none" stroke-linecap="round" opacity=".9"/>
+    <g stroke="#BEDD72" stroke-width="2.8" fill="none" stroke-linecap="round" opacity=".75">
+      <path d="M12,-23 C10,-29 8,-32 4,-35"/><path d="M23,-42 C21,-48 18,-51 14,-54"/>
+      <path d="M34,-60 C32,-66 29,-69 25,-72"/><path d="M45,-77 C44,-82 41,-85 38,-88"/>
+    </g>
+    <path d="M1,1 C-8,9 -13,19 -14,32" stroke="#4C862C" stroke-width="7" fill="none" stroke-linecap="round"/>
+  </g>
+</svg>
+
+  <!-- LOGO:END -->
+  <p class="kop__adres lbl">Roemer 16A<br>Boskoop</p>
+</header>
+
+<div class="top">
+  <div class="wrap" style="padding-bottom:0">
+    <h1>Tel je planten.<br><em>Betaal met iDEAL.</em></h1>
+    <p class="lead">Alles staat in een pot van 9 cm en kost hetzelfde. Vul in hoeveel je meeneemt.
+      Vanaf 24 stuks zakt de prijs vanzelf.</p>
+    <div class="staffel">
+      <div class="staffel__kaart">
+        <p class="staffel__prijs num">&euro;&nbsp;3,50</p>
+        <p class="staffel__wat">per stuk, 1 t/m 23</p>
+      </div>
+      <div class="staffel__kaart">
+        <p class="staffel__prijs num">&euro;&nbsp;3,00</p>
+        <p class="staffel__wat">per stuk, vanaf 24</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="wrap" id="rekenen">
+  <div class="teller">
+    <p class="teller__label lbl">Aantal planten</p>
+    <div class="teller__rij">
+      <button class="teller__knop" type="button" data-stap="-1" aria-label="Eén plant minder">&minus;</button>
+      <input class="teller__veld num" type="number" inputmode="numeric" min="0" max="999" step="1" value="0"
+             id="aantal" aria-label="Aantal planten">
+      <button class="teller__knop" type="button" data-stap="1" aria-label="Eén plant meer">+</button>
+    </div>
+    <div class="teller__snel">
+      <button type="button" data-zet="6">6</button>
+      <button type="button" data-zet="12">12</button>
+      <button type="button" data-zet="24">24</button>
+      <button type="button" data-zet="48">48</button>
+    </div>
+  </div>
+
+  <div class="meter" id="meter">
+    <p class="meter__tekst" id="meterTekst"></p>
+    <div class="meter__baan"><div class="meter__vul" id="meterVul"></div></div>
+  </div>
+
+  <div class="totaal">
+    <div id="specificatie"></div>
+    <div class="totaal__hoofd">
+      <span class="totaal__label">Totaal</span>
+      <span class="totaal__bedrag num" id="totaal">&euro;&nbsp;0,00</span>
+    </div>
+    <button class="knop" id="afrekenen" type="button" disabled>
+      <span id="knoptekst">Kopieer bedrag &amp; betaal</span>
+    </button>
+    <p class="leeg" id="leegmelding">Kies eerst hoeveel planten je meeneemt.</p>
+    <p class="hint" id="hint" hidden>Plak het bedrag op de betaalpagina.
+      Lukt plakken niet? Typ <b id="hintbedrag"></b> over.</p>
+  </div>
+
+  <p class="uitleg">
+    <b>Zo werkt het:</b> druk op de knop, dan wordt het bedrag gekopieerd en ga je naar de beveiligde
+    betaalpagina van Mollie. Daar plak of typ je het bedrag, kies je je bank en bevestig je.
+    Geen adres, geen account.
+  </p>
+
+  <div class="voet">
+    <p style="margin:0">Liever contant of pinnen? Ook goed, loop even naar binnen.</p>
+    <!-- TE BEVESTIGEN: openingstijden -->
+    <p class="voet__gegevens num">
+      Roemer 16A &middot; 2771 WS Boskoop<br>
+      wo&ndash;vr 9.00&ndash;17.30 &middot; za 9.00&ndash;17.00 <span style="opacity:.7">(voorlopig)</span><br>
+      <a href="mailto:hallo@biogroenboskoop.nl">hallo@biogroenboskoop.nl</a>
+    </p>
+  </div>
+</main>
+
+<script>
+/* =======================================================================
+   INSTELLINGEN
+   =======================================================================
+   LET OP, EERLIJK GEZEGD: deze pagina rekent het bedrag uit en zet het op het
+   klembord, maar de klant vult het zelf in op de betaalpagina van Mollie. De
+   betaallink staat op OPEN BEDRAG. Iemand die wil, kan dus een ander bedrag
+   typen dan hier staat. Dat is de prijs van een opstelling zonder server.
+
+   Gevolg voor de praktijk: controleer je Mollie-overzicht af en toe tegen wat
+   er uit de kas verdwijnt. Wil je dat onmogelijk maken, dan moet er alsnog
+   iets tussen staan dat het bedrag vastzet (zie docs/).
+
+   Houd deze bedragen gelijk aan het stoepbord en aan Shopify, anders schrikt
+   de klant.
+   ------------------------------------------------------------------------ */
+
+const WINKEL = {
+  /* Eén potmaat, één prijs. Bedragen in centen. */
+  prijs: 350,            // 1 t/m 23 stuks
+  staffelPrijs: 300,     // vanaf 24 stuks
+  staffelVanaf: 24,      // drempel over het hele mandje
+
+  /* De Mollie-betaallink met OPEN BEDRAG. De klant plakt of typt het totaal.
+     Let op: deze link moet in Mollie op 'herbruikbaar' staan, anders is hij
+     na één betaling op. Een herbruikbare link is maximaal twee jaar geldig. */
+  betaalLink: 'https://payment-links.mollie.com/payment/aqNuoYjcMxZRY5Yb4o5Qs',
+
+  max: 999
+};
+
+/* ===================== vanaf hier niets meer instellen ================= */
+
+const euro = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' });
+const bedrag = c => euro.format(c / 100);
+let aantal = 0;
+
+const veld = document.getElementById('aantal');
+const min  = document.querySelector('.teller__knop[data-stap="-1"]');
+
+function zet(waarde) {
+  let n = Math.floor(Number(waarde));
+  if (!isFinite(n) || n < 0) n = 0;
+  if (n > WINKEL.max) n = WINKEL.max;
+  aantal = n;
+  if (veld.value !== String(n)) veld.value = n;
+  herteken();
+}
+
+document.querySelector('.teller__rij').addEventListener('click', e => {
+  const b = e.target.closest('button[data-stap]');
+  if (b) zet(aantal + Number(b.dataset.stap));
+});
+veld.addEventListener('input', () => zet(veld.value));
+document.querySelector('.teller__snel').addEventListener('click', e => {
+  const b = e.target.closest('button[data-zet]');
+  if (b) zet(Number(b.dataset.zet));
+});
+
+function herteken() {
+  const per     = aantal >= WINKEL.staffelVanaf ? WINKEL.staffelPrijs : WINKEL.prijs;
+  const bruto   = aantal * WINKEL.prijs;
+  const korting = aantal * (WINKEL.prijs - per);
+
+  min.disabled = aantal === 0;
+
+  const meter = document.getElementById('meter');
+  const tekst = document.getElementById('meterTekst');
+  const vul   = document.getElementById('meterVul');
+  const nog   = WINKEL.staffelVanaf - aantal;
+  if (aantal >= WINKEL.staffelVanaf) {
+    meter.classList.add('meter--bereikt');
+    tekst.innerHTML = 'Staffel gehaald &mdash; je betaalt ' + bedrag(WINKEL.staffelPrijs) + ' per stuk.';
+    vul.style.width = '100%';
+  } else {
+    meter.classList.remove('meter--bereikt');
+    tekst.innerHTML = aantal === 0
+      ? 'Vanaf ' + WINKEL.staffelVanaf + ' stuks betaal je ' + bedrag(WINKEL.staffelPrijs) + ' per stuk.'
+      : 'Nog <b>' + nog + '</b> ' + (nog === 1 ? 'plant' : 'planten') + ' tot ' +
+        bedrag(WINKEL.staffelPrijs) + ' per stuk.';
+    vul.style.width = (aantal / WINKEL.staffelVanaf * 100).toFixed(1) + '%';
+  }
+
+  document.getElementById('specificatie').innerHTML =
+    '<div class="totaal__rij"><span class="num">' + aantal + (aantal === 1 ? ' plant' : ' planten') +
+      ' &times; ' + bedrag(WINKEL.prijs) + '</span><span class="num">' + bedrag(bruto) + '</span></div>' +
+    (korting > 0
+      ? '<div class="totaal__rij totaal__rij--korting"><span>Staffelkorting</span>' +
+        '<span class="num">&minus;\u00A0' + bedrag(korting) + '</span></div>'
+      : '');
+
+  document.getElementById('totaal').textContent = bedrag(bruto - korting);
+  document.getElementById('afrekenen').disabled = aantal === 0;
+  document.getElementById('leegmelding').hidden = aantal > 0;
+}
+
+const knop     = document.getElementById('afrekenen');
+const knoptekst= document.getElementById('knoptekst');
+const hint     = document.getElementById('hint');
+
+function bedragAlsTekst() {
+  const per = aantal >= WINKEL.staffelVanaf ? WINKEL.staffelPrijs : WINKEL.prijs;
+  return ((aantal * per) / 100).toFixed(2).replace('.', ',');
+}
+
+async function naarKlembord(tekst) {
+  try {
+    if (navigator.clipboard && window.isSecureContext) {
+      await navigator.clipboard.writeText(tekst);
+      return true;
+    }
+  } catch (e) { /* valt hieronder terug */ }
+  // Terugval voor oudere telefoons en pagina's zonder https
+  try {
+    const veld = document.createElement('textarea');
+    veld.value = tekst;
+    veld.setAttribute('readonly', '');
+    veld.style.cssText = 'position:absolute;left:-9999px;top:0';
+    document.body.appendChild(veld);
+    veld.select();
+    veld.setSelectionRange(0, veld.value.length);
+    const gelukt = document.execCommand('copy');
+    document.body.removeChild(veld);
+    return gelukt;
+  } catch (e) { return false; }
+}
+
+knop.addEventListener('click', async () => {
+  if (aantal < 1) return;
+  const tekst = bedragAlsTekst();
+  document.getElementById('hintbedrag').textContent = '\u20AC ' + tekst;
+
+  const gelukt = await naarKlembord(tekst);
+  knop.classList.add('knop--ok');
+  knoptekst.textContent = gelukt ? '\u20AC ' + tekst + ' gekopieerd \u2014 \u00e9\u00e9n moment\u2026'
+                                 : 'Je gaat naar de betaalpagina\u2026';
+  hint.hidden = false;
+
+  // Even laten zien dat er iets gebeurd is, dan door.
+  setTimeout(() => { window.location.href = WINKEL.betaalLink; }, 900);
+});
+
+herteken();
+</script>
+</body>
+</html>
