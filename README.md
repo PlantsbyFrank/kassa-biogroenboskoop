@@ -8,6 +8,7 @@ Zet ze naast elkaar op een https-adres en het werkt.
 | `index.html` | de rekenpagina: aantal invullen, totaal zien, bedrag kopiëren, door naar Mollie |
 | `bedankt.html` | de pagina waar Mollie de klant na het betalen op terugzet |
 | `bgb-fonts.css` | Nunito, in het bestand zelf meegebakken |
+| `Biogroen boskoop LOGO.svg` | Het aangeleverde logo. De pagina gebruikt dit bestand niet rechtstreeks: het logo zit in de pagina zelf gebakken, zodat het schijfje achter het blaadje de kleur van zijn ondergrond kan krijgen. Dit is de bron. |
 | `test-kassa.mjs` | 47 controles; draaien met `npm install playwright && node test-kassa.mjs` |
 
 ## Hoe het loopt
