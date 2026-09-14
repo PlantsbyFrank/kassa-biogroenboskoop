@@ -39,15 +39,24 @@ bestelling een eigen betaling aanmaakt. Dat is beschreven in `betaalfunctie/`.
 - Zet in Mollie de **redirect-URL** op `bedankt.html`, anders blijft de klant
   op de Mollie-pagina hangen.
 
-## Nog te doen
+## Onderhoud
 
-- [ ] GitHub Pages aanzetten (Settings -> Pages -> Deploy from a branch -> main, map /).
-- [ ] Eventueel `kassa.biogroenboskoop.nl` eraan hangen: CNAME-regel in de DNS naar
-      `plantsbyfrank.github.io`, en hier een bestand `CNAME` met die naam erin.
-- [ ] De QR op het stoepbord opnieuw maken zodra dat adres bekend is —
-      `stoepbord/tools/maak-qr.py`. **Niet eerder laten drukken.**
-- [ ] Het echte logobestand erin zetten; nu staat er nog een nabouw.
-- [ ] Openingstijden bevestigen (staan nu als "voorlopig" in de voettekst).
+Alles staat live en is met een echte betaling doorlopen. Wat er in de gaten
+gehouden moet worden:
+
+- **De Mollie-link verloopt.** Een herbruikbare betaallink is maximaal twee
+  jaar geldig. Daarna komt er een nieuwe, en dan is het hier één regel in
+  `index.html`. Het stoepbord hoeft niet opnieuw: de QR wijst naar deze
+  pagina, niet naar Mollie.
+- **Prijzen.** Staan in het blok `WINKEL` bovenin `index.html`, en nog een
+  keer in de tekst eromheen. Wijzig je ze, loop dan ook het bord langs.
+- **Het bedrag staat open.** Zie de waarschuwing hierboven: leg je
+  Mollie-overzicht af en toe naast wat er van het erf verdwijnt.
+- **Instellingen die aan moeten blijven staan** in Mollie: de link op
+  *herbruikbaar*, het bedrag op *open*, en de redirect-URL op
+  `https://kassa.biogroenboskoop.nl/bedankt.html`. En in GitHub:
+  Settings -> Pages met *Enforce HTTPS* aan, want zonder https weigert de
+  telefoon het kopiëren van het bedrag.
 
 ## Waar dit draait
 
