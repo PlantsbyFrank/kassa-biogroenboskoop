@@ -164,12 +164,41 @@ ok('doorgestuurd naar de link die de pagina zelf noemt',
    redirect === BETAALLINK, String(redirect));
 
 
-// --- logo leesbaar op de donkere kop ---
+// --- logo leesbaar op de kopbalk ---
 // (de pagina staat nu op de mollie-stub, dus eerst terug)
 await page.goto('http://127.0.0.1:8731/', { waitUntil:'networkidle' });
-const logoFill = await page.evaluate(() =>
-  getComputedStyle(document.querySelector('.kop .bgb-logo__plaats')).fill);
-ok('Boskoop is licht op de kop', logoFill === 'rgb(243, 239, 229)', logoFill);
+// Meet in de gerenderde pixels in plaats van in de css. Zo blijft deze controle
+// gelden als het logo later een <img> wordt in plaats van inline svg.
+await page.locator('.kop').screenshot({ path: path.join(ROOT, '.kop.png') });
+{
+  const png = fs.readFileSync(path.join(ROOT, '.kop.png'));
+  const uit = await page.evaluate(async b64 => {
+    const img = new Image();
+    img.src = 'data:image/png;base64,' + b64;
+    await img.decode();
+    const c = document.createElement('canvas');
+    c.width = img.width; c.height = img.height;
+    const ctx = c.getContext('2d');
+    ctx.drawImage(img, 0, 0);
+    const d = ctx.getImageData(0, 0, c.width, c.height).data;
+    const lum = (r,g,b) => {
+      const f = v => { v/=255; return v<=0.03928 ? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); };
+      return 0.2126*f(r) + 0.7152*f(g) + 0.0722*f(b);
+    };
+    // achtergrond = hoekpixel; donkerste pixel = de zwaarste letter van het logo
+    const achter = lum(d[0], d[1], d[2]);
+    let donkerst = 1;
+    for (let i = 0; i < d.length; i += 4) {
+      if (d[i+3] < 128) continue;
+      const L = lum(d[i], d[i+1], d[i+2]);
+      if (L < donkerst) donkerst = L;
+    }
+    const hoog = Math.max(achter, donkerst), laag = Math.min(achter, donkerst);
+    return { contrast: (hoog + 0.05) / (laag + 0.05) };
+  }, png.toString('base64'));
+  ok('logo steekt af tegen de kopbalk (>= 3:1)', uit.contrast >= 3,
+     uit.contrast.toFixed(2) + ':1');
+}
 
 // --- terugval als het klembord geweigerd wordt ---
 {
