@@ -34,6 +34,10 @@ page.on('console', m => { if (m.type()==='error') errors.push(m.text()+' @ '+JSO
 page.on('pageerror', e => errors.push('pageerror: '+e.message));
 page.on('response', r => { if (r.status() >= 400) badreq.push(r.status()+' '+r.url()); });
 
+// welke betaallink DE PAGINA zelf zegt te gebruiken
+const BETAALLINK = (fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8')
+  .match(/betaalLink:\s*'([^']+)'/) || [])[1];
+
 // blokkeer de echte mollie-redirect, maar leg wel vast dat hij komt
 let redirect = null;
 await page.route('https://payment-links.mollie.com/**', route => {
@@ -154,8 +158,10 @@ const kt = await page.textContent('#knoptekst');
 ok('knoptekst bevestigt kopie', /72,00/.test(kt) && /gekopieerd/.test(kt), kt);
 
 await page.waitForTimeout(1400);
-ok('doorgestuurd naar mollie-link',
-   redirect === 'https://payment-links.mollie.com/payment/aqNuoYjcMxZRY5Yb4o5Qs', String(redirect));
+ok('betaallink is een https mollie-betaallink',
+   /^https:\/\/payment-links\.mollie\.com\/payment\/[A-Za-z0-9]+$/.test(BETAALLINK || ''), String(BETAALLINK));
+ok('doorgestuurd naar de link die de pagina zelf noemt',
+   redirect === BETAALLINK, String(redirect));
 
 
 // --- logo leesbaar op de donkere kop ---
