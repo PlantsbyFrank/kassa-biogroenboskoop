@@ -36,30 +36,31 @@ a{color:inherit}
 h1{font-weight:800;font-size:clamp(30px,8vw,40px);line-height:1.06;letter-spacing:-.015em;margin:0 0 8px}
 h1 em{font-style:italic;color:var(--dark)}
 .lead{margin:0;color:var(--dark)}
-.staffel{display:flex;gap:10px;margin:16px 0 0;flex-wrap:wrap}
-.staffel__kaart{flex:1 1 150px;background:var(--cream);border-radius:12px;padding:11px 13px}
-.staffel__prijs{font-weight:800;font-size:24px;line-height:1.1;margin:0}
-.staffel__wat{margin:2px 0 0;color:var(--moss);font-size:13px}
-
-.teller{background:#FBF9F3;border:1.5px solid var(--line);border-radius:16px;padding:18px 16px 16px;text-align:center}
-.teller__label{margin:0 0 12px;color:var(--moss)}
-.teller__rij{display:flex;align-items:center;justify-content:center;gap:12px}
-.teller__knop{width:64px;height:64px;border:2px solid var(--night);background:#FBF9F3;color:var(--night);
-  border-radius:16px;font-size:32px;font-weight:800;line-height:1;cursor:pointer;display:grid;
-  place-items:center;padding:0;font-family:var(--f)}
-.teller__knop:hover:not(:disabled){background:var(--lime)}
-.teller__knop:disabled{opacity:.3;cursor:default}
-.teller__veld{width:124px;height:64px;text-align:center;font-size:38px;font-weight:800;font-family:var(--f);
-  border:2px solid var(--line);border-radius:16px;background:#fff;color:var(--night);
-  -moz-appearance:textfield;font-variant-numeric:tabular-nums}
-.teller__veld::-webkit-outer-spin-button,.teller__veld::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
-.teller__snel{display:flex;gap:8px;justify-content:center;margin:14px 0 0;flex-wrap:wrap}
-.teller__snel button{min-width:56px;min-height:44px;padding:0 14px;border:1.5px solid var(--line);
+.regel{background:#FBF9F3;border:1.5px solid var(--line);border-radius:16px;
+  padding:14px 15px 15px;margin:0 0 12px}
+.regel__kop{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin:0 0 12px}
+.regel__naam{margin:0;font-weight:800;font-size:18px;line-height:1.2}
+.regel__pot{margin:2px 0 0;color:var(--moss);font-size:13.5px}
+.regel__prijs{margin:0;font-weight:800;font-size:17px;white-space:nowrap}
+.regel__prijs small{display:block;font-weight:400;font-size:12px;color:var(--moss);text-align:right}
+.regel__rij{display:flex;align-items:center;gap:10px}
+.regel__knop{width:52px;height:52px;flex:0 0 auto;border:2px solid var(--night);background:#FBF9F3;
+  color:var(--night);border-radius:14px;font-size:27px;font-weight:800;line-height:1;cursor:pointer;
+  display:grid;place-items:center;padding:0;font-family:var(--f)}
+.regel__knop:hover:not(:disabled){background:var(--lime)}
+.regel__knop:disabled{opacity:.3;cursor:default}
+.regel__veld{width:74px;height:52px;flex:0 0 auto;text-align:center;font-size:28px;font-weight:800;
+  font-family:var(--f);border:2px solid var(--line);border-radius:14px;background:#fff;color:var(--night);
+  -moz-appearance:textfield;font-variant-numeric:tabular-nums;padding:0}
+.regel__veld::-webkit-outer-spin-button,.regel__veld::-webkit-inner-spin-button{-webkit-appearance:none;margin:0}
+.regel__som{margin:0 0 0 auto;font-weight:800;font-size:19px;white-space:nowrap}
+.regel__som--nul{color:#A9A48F;font-weight:600}
+.regel__snel{display:flex;gap:8px;margin:12px 0 0;flex-wrap:wrap}
+.regel__snel button{min-width:52px;min-height:44px;padding:0 13px;border:1.5px solid var(--line);
   background:var(--cream);color:var(--dark);border-radius:11px;font-family:var(--f);font-weight:600;
   font-size:15px;cursor:pointer;font-variant-numeric:tabular-nums}
-.teller__snel button:hover{border-color:var(--night);background:var(--pastel)}
-
-.meter{margin:18px 0 0;background:#FBF9F3;border:1.5px solid var(--line);border-radius:14px;padding:14px 15px}
+.regel__snel button:hover{border-color:var(--night);background:var(--pastel)}
+.meter{margin:12px 0 0;background:#FBF9F3;border:1.5px solid var(--line);border-radius:14px;padding:14px 15px}
 .meter__tekst{margin:0 0 9px;font-size:14.5px;color:var(--dark)}
 .meter__tekst b{color:var(--terra);font-weight:800}
 .meter__baan{height:10px;background:var(--line);border-radius:999px;overflow:hidden}
@@ -103,42 +104,13 @@ h1 em{font-style:italic;color:var(--dark)}
 <div class="top">
   <div class="wrap" style="padding-bottom:0">
     <h1>Tel je planten.<br><em>Betaal met iDEAL.</em></h1>
-    <p class="lead">Alles staat in een pot van 9 cm en kost hetzelfde. Vul in hoeveel je meeneemt.
-      Vanaf 24 stuks zakt de prijs vanzelf.</p>
-    <div class="staffel">
-      <div class="staffel__kaart">
-        <p class="staffel__prijs num">&euro;&nbsp;3,50</p>
-        <p class="staffel__wat">per stuk, 1 t/m 23</p>
-      </div>
-      <div class="staffel__kaart">
-        <p class="staffel__prijs num">&euro;&nbsp;3,00</p>
-        <p class="staffel__wat">per stuk, vanaf 24</p>
-      </div>
-    </div>
+    <p class="lead">Vul per soort in hoeveel je meeneemt. Bij de vaste planten
+      zakt de prijs vanzelf vanaf 24 stuks.</p>
   </div>
 </div>
 
 <main class="wrap" id="rekenen">
-  <div class="teller">
-    <p class="teller__label lbl">Aantal planten</p>
-    <div class="teller__rij">
-      <button class="teller__knop" type="button" data-stap="-1" aria-label="Eén plant minder">&minus;</button>
-      <input class="teller__veld num" type="number" inputmode="numeric" min="0" max="999" step="1" value="0"
-             id="aantal" aria-label="Aantal planten">
-      <button class="teller__knop" type="button" data-stap="1" aria-label="Eén plant meer">+</button>
-    </div>
-    <div class="teller__snel">
-      <button type="button" data-zet="6">6</button>
-      <button type="button" data-zet="12">12</button>
-      <button type="button" data-zet="24">24</button>
-      <button type="button" data-zet="48">48</button>
-    </div>
-  </div>
-
-  <div class="meter" id="meter">
-    <p class="meter__tekst" id="meterTekst"></p>
-    <div class="meter__baan"><div class="meter__vul" id="meterVul"></div></div>
-  </div>
+  <div id="regels"></div>
 
   <div class="totaal">
     <div id="specificatie"></div>
@@ -149,7 +121,7 @@ h1 em{font-style:italic;color:var(--dark)}
     <button class="knop" id="afrekenen" type="button" disabled>
       <span id="knoptekst">Kopieer bedrag &amp; betaal</span>
     </button>
-    <p class="leeg" id="leegmelding">Kies eerst hoeveel planten je meeneemt.</p>
+    <p class="leeg" id="leegmelding">Kies eerst hoeveel je meeneemt.</p>
     <p class="hint" id="hint" hidden>Plak het bedrag op de betaalpagina.
       Lukt plakken niet? Typ <b id="hintbedrag"></b> over.</p>
   </div>
@@ -175,22 +147,27 @@ h1 em{font-style:italic;color:var(--dark)}
    typen dan hier staat. Dat is de prijs van een opstelling zonder server.
 
    Gevolg voor de praktijk: controleer je Mollie-overzicht af en toe tegen wat
-   er uit de kas verdwijnt. Wil je dat onmogelijk maken, dan moet er alsnog
-   iets tussen staan dat het bedrag vastzet (zie docs/).
+   er uit de kas verdwijnt.
 
-   Houd deze bedragen gelijk aan het stoepbord en aan Shopify, anders schrikt
-   de klant.
+   De staffel hoort BIJ EEN PRODUCT en telt alleen zijn eigen stuks mee. Twintig
+   vaste planten plus vier fruitstruiken halen de staffel dus niet: dat zijn
+   twintig vaste planten. Wil je dat anders, zeg het -- het is een andere manier
+   van tellen, geen ander bedrag hier.
+
+   Houd deze bedragen gelijk aan het stoepbord, anders schrikt de klant.
    ------------------------------------------------------------------------ */
 
 const WINKEL = {
-  /* Eén potmaat, één prijs. Bedragen in centen. */
-  prijs: 350,            // 1 t/m 23 stuks
-  staffelPrijs: 300,     // vanaf 24 stuks
-  staffelVanaf: 24,      // drempel over het hele mandje
+  producten: [
+    { id: 'vast',   naam: 'Vaste planten', pot: '9 cm pot',     prijs: 350,
+      staffelVanaf: 24, staffelPrijs: 300, snel: [6, 12, 24, 48] },
+    { id: 'struik', naam: 'Fruitstruiken', pot: '15 cm pot',    prijs: 750 },
+    { id: 'boom',   naam: 'Fruitbomen',    pot: '11 liter pot', prijs: 1795 },
+  ],
 
   /* De Mollie-betaallink met OPEN BEDRAG. De klant plakt of typt het totaal.
-     Let op: deze link moet in Mollie op 'herbruikbaar' staan, anders is hij
-     na één betaling op. Een herbruikbare link is maximaal twee jaar geldig. */
+     Deze link moet in Mollie op 'herbruikbaar' staan, anders is hij na één
+     betaling op. Een herbruikbare link is maximaal twee jaar geldig. */
   betaalLink: 'https://payment-links.mollie.com/payment/GojhaQ3cELcu7Ru4Kw8av',
 
   max: 999
@@ -198,77 +175,149 @@ const WINKEL = {
 
 /* ===================== vanaf hier niets meer instellen ================= */
 
-const euro = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' });
+const euro   = new Intl.NumberFormat('nl-NL', { style: 'currency', currency: 'EUR' });
 const bedrag = c => euro.format(c / 100);
-let aantal = 0;
 
-const veld = document.getElementById('aantal');
-const min  = document.querySelector('.teller__knop[data-stap="-1"]');
+const aantal = Object.create(null);
+WINKEL.producten.forEach(p => { aantal[p.id] = 0; });
 
-function zet(waarde) {
+const stukprijs = p =>
+  (p.staffelVanaf && aantal[p.id] >= p.staffelVanaf) ? p.staffelPrijs : p.prijs;
+const regelCenten  = p => aantal[p.id] * stukprijs(p);
+const kortingCenten = p => aantal[p.id] * (p.prijs - stukprijs(p));
+const totaalCenten = () => WINKEL.producten.reduce((som, p) => som + regelCenten(p), 0);
+const stuksTotaal  = () => WINKEL.producten.reduce((som, p) => som + aantal[p.id], 0);
+
+/* ------------------------------ opbouw -------------------------------- */
+
+const vak = document.getElementById('regels');
+
+for (const p of WINKEL.producten) {
+  const kaart = document.createElement('div');
+  kaart.className = 'regel';
+  kaart.dataset.id = p.id;
+
+  const staffelregel = p.staffelVanaf
+    ? '<small>' + bedrag(p.staffelPrijs) + ' vanaf ' + p.staffelVanaf + '</small>' : '';
+  const snelknoppen = p.snel
+    ? '<div class="regel__snel">' + p.snel.map(n =>
+        '<button type="button" data-zet="' + n + '">' + n + '</button>').join('') + '</div>'
+    : '';
+  const meter = p.staffelVanaf
+    ? '<div class="meter"><p class="meter__tekst"></p>' +
+      '<div class="meter__baan"><div class="meter__vul"></div></div></div>'
+    : '';
+
+  kaart.innerHTML =
+    '<div class="regel__kop">' +
+      '<div><p class="regel__naam">' + p.naam + '</p>' +
+      '<p class="regel__pot">' + p.pot + '</p></div>' +
+      '<p class="regel__prijs num">' + bedrag(p.prijs) + staffelregel + '</p>' +
+    '</div>' +
+    '<div class="regel__rij">' +
+      '<button class="regel__knop" type="button" data-stap="-1" ' +
+        'aria-label="Een ' + p.naam.toLowerCase() + ' minder">&minus;</button>' +
+      '<input class="regel__veld num" type="number" inputmode="numeric" min="0" ' +
+        'max="' + WINKEL.max + '" step="1" value="0" aria-label="Aantal ' + p.naam.toLowerCase() + '">' +
+      '<button class="regel__knop" type="button" data-stap="1" ' +
+        'aria-label="Een ' + p.naam.toLowerCase() + ' meer">+</button>' +
+      '<span class="regel__som num regel__som--nul">' + bedrag(0) + '</span>' +
+    '</div>' + snelknoppen + meter;
+
+  vak.appendChild(kaart);
+}
+
+function zet(p, waarde) {
   let n = Math.floor(Number(waarde));
   if (!isFinite(n) || n < 0) n = 0;
   if (n > WINKEL.max) n = WINKEL.max;
-  aantal = n;
+  aantal[p.id] = n;
+  const veld = vak.querySelector('[data-id="' + p.id + '"] .regel__veld');
   if (veld.value !== String(n)) veld.value = n;
   herteken();
 }
 
-document.querySelector('.teller__rij').addEventListener('click', e => {
-  const b = e.target.closest('button[data-stap]');
-  if (b) zet(aantal + Number(b.dataset.stap));
+vak.addEventListener('click', e => {
+  const kaart = e.target.closest('.regel');
+  if (!kaart) return;
+  const p = WINKEL.producten.find(x => x.id === kaart.dataset.id);
+  const stap = e.target.closest('button[data-stap]');
+  if (stap) return zet(p, aantal[p.id] + Number(stap.dataset.stap));
+  const sprong = e.target.closest('button[data-zet]');
+  if (sprong) return zet(p, Number(sprong.dataset.zet));
 });
-veld.addEventListener('input', () => zet(veld.value));
-document.querySelector('.teller__snel').addEventListener('click', e => {
-  const b = e.target.closest('button[data-zet]');
-  if (b) zet(Number(b.dataset.zet));
+
+vak.addEventListener('input', e => {
+  const kaart = e.target.closest('.regel');
+  if (!kaart || !e.target.classList.contains('regel__veld')) return;
+  zet(WINKEL.producten.find(x => x.id === kaart.dataset.id), e.target.value);
 });
+
+/* ----------------------------- bijwerken ------------------------------ */
 
 function herteken() {
-  const per     = aantal >= WINKEL.staffelVanaf ? WINKEL.staffelPrijs : WINKEL.prijs;
-  const bruto   = aantal * WINKEL.prijs;
-  const korting = aantal * (WINKEL.prijs - per);
+  for (const p of WINKEL.producten) {
+    const kaart = vak.querySelector('[data-id="' + p.id + '"]');
+    const n = aantal[p.id];
 
-  min.disabled = aantal === 0;
+    kaart.querySelector('button[data-stap="-1"]').disabled = n === 0;
 
-  const meter = document.getElementById('meter');
-  const tekst = document.getElementById('meterTekst');
-  const vul   = document.getElementById('meterVul');
-  const nog   = WINKEL.staffelVanaf - aantal;
-  if (aantal >= WINKEL.staffelVanaf) {
-    meter.classList.add('meter--bereikt');
-    tekst.innerHTML = 'Staffel gehaald &mdash; je betaalt ' + bedrag(WINKEL.staffelPrijs) + ' per stuk.';
-    vul.style.width = '100%';
-  } else {
-    meter.classList.remove('meter--bereikt');
-    tekst.innerHTML = aantal === 0
-      ? 'Vanaf ' + WINKEL.staffelVanaf + ' stuks betaal je ' + bedrag(WINKEL.staffelPrijs) + ' per stuk.'
-      : 'Nog <b>' + nog + '</b> ' + (nog === 1 ? 'plant' : 'planten') + ' tot ' +
-        bedrag(WINKEL.staffelPrijs) + ' per stuk.';
-    vul.style.width = (aantal / WINKEL.staffelVanaf * 100).toFixed(1) + '%';
+    const som = kaart.querySelector('.regel__som');
+    som.textContent = bedrag(regelCenten(p));
+    som.classList.toggle('regel__som--nul', n === 0);
+
+    if (!p.staffelVanaf) continue;
+    const meter = kaart.querySelector('.meter');
+    const tekst = kaart.querySelector('.meter__tekst');
+    const vul   = kaart.querySelector('.meter__vul');
+    const nog   = p.staffelVanaf - n;
+    if (n >= p.staffelVanaf) {
+      meter.classList.add('meter--bereikt');
+      tekst.innerHTML = 'Staffel gehaald &mdash; je betaalt ' + bedrag(p.staffelPrijs) + ' per stuk.';
+      vul.style.width = '100%';
+    } else {
+      meter.classList.remove('meter--bereikt');
+      tekst.innerHTML = n === 0
+        ? 'Vanaf ' + p.staffelVanaf + ' stuks betaal je ' + bedrag(p.staffelPrijs) + ' per stuk.'
+        : 'Nog <b>' + nog + '</b> ' + (nog === 1 ? 'plant' : 'planten') + ' tot ' +
+          bedrag(p.staffelPrijs) + ' per stuk.';
+      vul.style.width = (n / p.staffelVanaf * 100).toFixed(1) + '%';
+    }
   }
 
-  document.getElementById('specificatie').innerHTML =
-    '<div class="totaal__rij"><span class="num">' + aantal + (aantal === 1 ? ' plant' : ' planten') +
-      ' &times; ' + bedrag(WINKEL.prijs) + '</span><span class="num">' + bedrag(bruto) + '</span></div>' +
-    (korting > 0
-      ? '<div class="totaal__rij totaal__rij--korting"><span>Staffelkorting</span>' +
-        '<span class="num">&minus;\u00A0' + bedrag(korting) + '</span></div>'
-      : '');
+  let regels = '';
+  for (const p of WINKEL.producten) {
+    const n = aantal[p.id];
+    if (n === 0) continue;
+    // Tegen de basisprijs, want de korting staat eronder als eigen regel. Zou
+    // hier de staffelprijs staan, dan werd de korting twee keer getoond en
+    // telde de specificatie niet op naar het totaal.
+    regels +=
+      '<div class="totaal__rij"><span class="num">' + n + '&times; ' + p.naam.toLowerCase() +
+        ' &agrave; ' + bedrag(p.prijs) + '</span>' +
+      '<span class="num">' + bedrag(n * p.prijs) + '</span></div>';
+    const korting = kortingCenten(p);
+    if (korting > 0) {
+      regels +=
+        '<div class="totaal__rij totaal__rij--korting"><span>Staffelkorting</span>' +
+        '<span class="num">&minus; ' + bedrag(korting) + '</span></div>';
+    }
+  }
+  document.getElementById('specificatie').innerHTML = regels;
 
-  document.getElementById('totaal').textContent = bedrag(bruto - korting);
-  document.getElementById('afrekenen').disabled = aantal === 0;
-  document.getElementById('leegmelding').hidden = aantal > 0;
+  const leeg = stuksTotaal() === 0;
+  document.getElementById('totaal').textContent = bedrag(totaalCenten());
+  document.getElementById('afrekenen').disabled = leeg;
+  document.getElementById('leegmelding').hidden = !leeg;
 }
 
-const knop     = document.getElementById('afrekenen');
-const knoptekst= document.getElementById('knoptekst');
-const hint     = document.getElementById('hint');
+/* ----------------------------- afrekenen ------------------------------ */
 
-function bedragAlsTekst() {
-  const per = aantal >= WINKEL.staffelVanaf ? WINKEL.staffelPrijs : WINKEL.prijs;
-  return ((aantal * per) / 100).toFixed(2).replace('.', ',');
-}
+const knop      = document.getElementById('afrekenen');
+const knoptekst = document.getElementById('knoptekst');
+const hint      = document.getElementById('hint');
+
+const bedragAlsTekst = () => (totaalCenten() / 100).toFixed(2).replace('.', ',');
 
 async function naarKlembord(tekst) {
   try {
@@ -293,14 +342,14 @@ async function naarKlembord(tekst) {
 }
 
 knop.addEventListener('click', async () => {
-  if (aantal < 1) return;
+  if (stuksTotaal() < 1) return;
   const tekst = bedragAlsTekst();
-  document.getElementById('hintbedrag').textContent = '\u20AC ' + tekst;
+  document.getElementById('hintbedrag').textContent = '€ ' + tekst;
 
   const gelukt = await naarKlembord(tekst);
   knop.classList.add('knop--ok');
-  knoptekst.textContent = gelukt ? '\u20AC ' + tekst + ' gekopieerd \u2014 \u00e9\u00e9n moment\u2026'
-                                 : 'Je gaat naar de betaalpagina\u2026';
+  knoptekst.textContent = gelukt ? '€ ' + tekst + ' gekopieerd — één moment…'
+                                 : 'Je gaat naar de betaalpagina…';
   hint.hidden = false;
 
   // Even laten zien dat er iets gebeurd is, dan door.

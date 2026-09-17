@@ -48,8 +48,13 @@ gehouden moet worden:
   jaar geldig. Daarna komt er een nieuwe, en dan is het hier één regel in
   `index.html`. Het stoepbord hoeft niet opnieuw: de QR wijst naar deze
   pagina, niet naar Mollie.
-- **Prijzen.** Staan in het blok `WINKEL` bovenin `index.html`, en nog een
-  keer in de tekst eromheen. Wijzig je ze, loop dan ook het bord langs.
+- **Prijzen en producten.** Staan alleen in het blok `WINKEL` bovenin
+  `index.html`. De pagina bouwt de regels daaruit op, dus een product erbij is
+  een regel erbij. Wijzig je een prijs, loop dan ook het bord langs.
+- **De staffel telt per product.** Twintig vaste planten plus vier
+  fruitstruiken halen de staffel niet; dat zijn twintig vaste planten. Moet dat
+  over het hele mandje gaan tellen, dan is dat een andere manier van tellen en
+  moet de code mee.
 - **Het bedrag staat open.** Zie de waarschuwing hierboven: leg je
   Mollie-overzicht af en toe naast wat er van het erf verdwijnt.
 - **Instellingen die aan moeten blijven staan** in Mollie: de link op
