@@ -30,6 +30,31 @@ const ok = (naam, cond, extra='') => {
 const HTML = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
 const BETAALLINK = (HTML.match(/betaalLink:\s*'([^']+)'/) || [])[1];
 
+/* De prijzen staan hier expres NOG EEN KEER, los van index.html. Zou de test ze
+   uit de pagina lezen, dan controleert hij alleen of de pagina het met zichzelf
+   eens is. Nu valt hij om zodra iemand een prijs wijzigt zonder het hier bij te
+   werken -- en dat is precies de bedoeling.
+
+   Prijs wijzigen? Twee plekken: het blok WINKEL in index.html en de tabel hier. */
+const PRIJS = {
+  vast:   { prijs: 350, staffelVanaf: 24, staffelPrijs: 300 },
+  struik: { prijs: 800 },
+  boom:   { prijs: 1995 },
+};
+
+// Eigen sommetje, met opzet anders opgeschreven dan de pagina het doet.
+function verwachtCenten(mand) {
+  let som = 0;
+  for (const [id, n] of Object.entries(mand)) {
+    const p = PRIJS[id];
+    const perStuk = (p.staffelVanaf && n >= p.staffelVanaf) ? p.staffelPrijs : p.prijs;
+    som += n * perStuk;
+  }
+  return som;
+}
+const alsTekst = c => (c / 100).toFixed(2).replace('.', ',')
+  .replace(/\B(?=(\d{3})+(?!\d),)/g, '.');
+
 const browser = await chromium.launch({ executablePath: process.env.CHROMIUM || undefined });
 const ctx = await browser.newContext({ viewport:{width:390,height:844}, deviceScaleFactor:2,
   permissions:['clipboard-read','clipboard-write'] });
@@ -78,17 +103,22 @@ const leeg = async () => { for (const id of ['vast','struik','boom']) await zet(
 let s = await lees();
 ok('drie productregels', s.regels.length === 3, s.regels.map(r=>r.id).join(', '));
 const verwacht = [
-  ['vast',   'Vaste planten', '9 cm pot',     '3,50', '3,00 vanaf 24'],
-  ['struik', 'Fruitstruiken', '15 cm pot',    '7,50', null],
-  ['boom',   'Fruitbomen',    '11 liter pot', '17,95', null],
+  ['vast',   'Vaste planten', '9 cm pot'],
+  ['struik', 'Fruitstruiken', '15 cm pot'],
+  ['boom',   'Fruitbomen',    '11 liter pot'],
 ];
-for (const [i,[id,naam,pot,prijs,staffel]] of verwacht.entries()) {
+for (const [i,[id,naam,pot]] of verwacht.entries()) {
   const r = s.regels[i];
-  ok(`regel ${i+1}: ${naam} (${pot}, € ${prijs})`,
-     r.id===id && r.naam===naam && r.pot===pot && r.prijs.includes(prijs),
+  const p = PRIJS[id];
+  ok(`regel ${i+1}: ${naam} (${pot}, EUR ${alsTekst(p.prijs)})`,
+     r.id===id && r.naam===naam && r.pot===pot && r.prijs.includes(alsTekst(p.prijs)),
      `${r.naam} / ${r.pot} / ${r.prijs}`);
-  if (staffel) ok('  toont de staffelprijs', r.prijs.includes('3,00') && r.prijs.includes('24'), r.prijs);
-  else ok(`  ${naam}: geen staffel`, r.meter === null && !r.prijs.includes('vanaf'), r.prijs);
+  if (p.staffelVanaf) {
+    ok('  toont de staffelprijs',
+       r.prijs.includes(alsTekst(p.staffelPrijs)) && r.prijs.includes(String(p.staffelVanaf)), r.prijs);
+  } else {
+    ok(`  ${naam}: geen staffel`, r.meter === null && !r.prijs.includes('vanaf'), r.prijs);
+  }
 }
 
 ok('start: knop uit', s.knop === true);
@@ -97,35 +127,36 @@ ok('start: alle minknoppen uit', s.regels.every(r => r.min === true));
 ok('start: totaal 0,00', /0,00/.test(s.totaal), s.totaal);
 
 // ---------------- rekenen per product ----------------
-const proeven = [
-  [{vast:1},                '3,50'],
-  [{vast:23},               '80,50'],
-  [{vast:24},               '72,00'],
-  [{vast:25},               '75,00'],
-  [{vast:999},              '2.997,00'],
-  [{struik:1},              '7,50'],
-  [{struik:4},              '30,00'],
-  [{struik:24},             '180,00'],   // struiken kennen geen staffel
-  [{boom:1},                '17,95'],
-  [{boom:3},                '53,85'],
-  [{boom:24},               '430,80'],
-  [{vast:23, struik:4},     '110,50'],   // 80,50 + 30,00, staffel niet gehaald
-  [{vast:24, struik:2, boom:1}, '104,95'], // 72,00 + 15,00 + 17,95
-  [{vast:2, struik:1, boom:1},  '32,45'],  // 7,00 + 7,50 + 17,95
+const manden = [
+  {vast:1}, {vast:23}, {vast:24}, {vast:25}, {vast:999},
+  {struik:1}, {struik:4}, {struik:24},            // struiken kennen geen staffel
+  {boom:1}, {boom:3}, {boom:24},
+  {vast:23, struik:4},                            // staffel net niet gehaald
+  {vast:24, struik:2, boom:1},
+  {vast:2, struik:1, boom:1},
 ];
-for (const [mand, totaal] of proeven) {
+for (const mand of manden) {
   await leeg();
   for (const [id, n] of Object.entries(mand)) await zet(id, n);
   s = await lees();
   const naam = Object.entries(mand).map(([k,v])=>`${v} ${k}`).join(' + ');
-  ok(`${naam} => € ${totaal}`, s.totaal.includes(totaal), s.totaal);
+  const wil = alsTekst(verwachtCenten(mand));
+  ok(`${naam} => EUR ${wil}`, s.totaal.includes(wil), s.totaal);
 }
+
+// de staffel mag niet stilletjes bij het fruit opduiken
+await leeg(); await zet('struik', 24); s = await lees();
+ok('24 fruitstruiken: geen staffelkorting',
+   !/Staffelkorting/.test(s.spec) && s.totaal.includes(alsTekst(24 * PRIJS.struik.prijs)), s.totaal);
+await leeg(); await zet('boom', 24); s = await lees();
+ok('24 fruitbomen: geen staffelkorting',
+   !/Staffelkorting/.test(s.spec) && s.totaal.includes(alsTekst(24 * PRIJS.boom.prijs)), s.totaal);
 
 // ---------------- de staffel telt alleen zijn eigen stuks ----------------
 await leeg(); await zet('vast', 20); await zet('struik', 10);
 s = await lees();
 ok('20 vast + 10 struik: staffel NIET gehaald',
-   !/Staffel gehaald/.test(s.regels[0].meter) && s.totaal.includes('145,00'), s.totaal);
+   !/Staffel gehaald/.test(s.regels[0].meter) && s.totaal.includes(alsTekst(verwachtCenten({vast:20, struik:10}))), s.totaal);
 ok('  meter zegt nog 4 planten', /Nog 4 planten/.test(s.regels[0].meter), s.regels[0].meter);
 
 await leeg(); await zet('vast', 24);
@@ -162,8 +193,10 @@ for (const mand of [{vast:24}, {vast:24, struik:2, boom:1}, {vast:30, boom:2}, {
 await leeg(); await zet('vast', 24); await zet('struik', 2); await zet('boom', 1);
 s = await lees();
 ok('regeltotaal vaste planten 72,00',  s.regels[0].som.includes('72,00'),  s.regels[0].som);
-ok('regeltotaal fruitstruiken 15,00',  s.regels[1].som.includes('15,00'),  s.regels[1].som);
-ok('regeltotaal fruitbomen 17,95',     s.regels[2].som.includes('17,95'),  s.regels[2].som);
+ok('regeltotaal fruitstruiken '+alsTekst(2*PRIJS.struik.prijs),
+   s.regels[1].som.includes(alsTekst(2*PRIJS.struik.prijs)), s.regels[1].som);
+ok('regeltotaal fruitbomen '+alsTekst(PRIJS.boom.prijs),
+   s.regels[2].som.includes(alsTekst(PRIJS.boom.prijs)), s.regels[2].som);
 
 // ---------------- knoppen ----------------
 await leeg();
@@ -226,12 +259,14 @@ await page.setViewportSize({ width:390, height:844 });
 await leeg(); await zet('vast', 24); await zet('struik', 2); await zet('boom', 1);
 await page.click('#afrekenen');
 await page.waitForTimeout(120);
-ok('klembord bevat 104,95', (await page.evaluate(() => navigator.clipboard.readText())) === '104,95',
+const wilKlembord = alsTekst(verwachtCenten({vast:24, struik:2, boom:1}));
+ok('klembord bevat '+wilKlembord,
+   (await page.evaluate(() => navigator.clipboard.readText())) === wilKlembord,
    JSON.stringify(await page.evaluate(() => navigator.clipboard.readText())));
 s = await lees();
 ok('hint zichtbaar na klik', s.hint === true);
-ok('hint toont € 104,95', schoon(await page.textContent('#hintbedrag')).includes('104,95'));
-ok('knoptekst bevestigt kopie', /104,95/.test(await page.textContent('#knoptekst')));
+ok('hint toont '+wilKlembord, schoon(await page.textContent('#hintbedrag')).includes(wilKlembord));
+ok('knoptekst bevestigt kopie', (await page.textContent('#knoptekst')).includes(wilKlembord));
 await page.waitForTimeout(1400);
 ok('betaallink is een https mollie-betaallink',
    /^https:\/\/payment-links\.mollie\.com\/payment\/[A-Za-z0-9]+$/.test(BETAALLINK || ''), String(BETAALLINK));
@@ -281,7 +316,7 @@ await page.locator('.kop').screenshot({ path: path.join(ROOT, '.kop.png') });
   ok('terugval: geen valse kopieermelding', !/gekopieerd/.test(t3), t3);
   ok('terugval: bedrag staat er om over te typen',
      (await p3.evaluate(() => !document.getElementById('hint').hidden)) &&
-     schoon(await p3.textContent('#hintbedrag')).includes('35,90'),
+     schoon(await p3.textContent('#hintbedrag')).includes(alsTekst(verwachtCenten({boom:2}))),
      schoon(await p3.textContent('#hintbedrag')));
   await p3.waitForTimeout(1400);
   ok('terugval: toch doorgestuurd naar mollie', r3 !== null, String(r3));
