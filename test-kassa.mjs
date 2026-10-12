@@ -40,6 +40,7 @@ const PRIJS = {
   vast:   { prijs: 350, staffelVanaf: 24, staffelPrijs: 300 },
   struik: { prijs: 800 },
   boom:   { prijs: 1995 },
+  grond:  { prijs: 800 },
 };
 
 // Eigen sommetje, met opzet anders opgeschreven dan de pagina het doet.
@@ -97,15 +98,16 @@ const lees = () => page.evaluate(() => {
 });
 const veld = id => page.locator(`.regel[data-id="${id}"] .regel__veld`);
 const zet  = async (id, n) => { await veld(id).fill(String(n)); await page.waitForTimeout(25); };
-const leeg = async () => { for (const id of ['vast','struik','boom']) await zet(id, 0); };
+const leeg = async () => { for (const id of ['vast','struik','boom','grond']) await zet(id, 0); };
 
 // ---------------- de drie producten staan er ----------------
 let s = await lees();
-ok('drie productregels', s.regels.length === 3, s.regels.map(r=>r.id).join(', '));
+ok('vier productregels', s.regels.length === 4, s.regels.map(r=>r.id).join(', '));
 const verwacht = [
   ['vast',   'Vaste planten', '9 cm pot'],
   ['struik', 'Fruitstruiken', '15 cm pot'],
   ['boom',   'Fruitbomen',    '11 liter pot'],
+  ['grond',  'Veenvrije bio potgrond', 'per zak'],
 ];
 for (const [i,[id,naam,pot]] of verwacht.entries()) {
   const r = s.regels[i];
@@ -134,6 +136,9 @@ const manden = [
   {vast:23, struik:4},                            // staffel net niet gehaald
   {vast:24, struik:2, boom:1},
   {vast:2, struik:1, boom:1},
+  {grond:1}, {grond:3}, {grond:24},               // potgrond kent geen staffel
+  {vast:24, grond:2},
+  {vast:12, struik:2, boom:1, grond:3},           // alles door elkaar
 ];
 for (const mand of manden) {
   await leeg();
@@ -151,6 +156,9 @@ ok('24 fruitstruiken: geen staffelkorting',
 await leeg(); await zet('boom', 24); s = await lees();
 ok('24 fruitbomen: geen staffelkorting',
    !/Staffelkorting/.test(s.spec) && s.totaal.includes(alsTekst(24 * PRIJS.boom.prijs)), s.totaal);
+await leeg(); await zet('grond', 24); s = await lees();
+ok('24 zakken potgrond: geen staffelkorting',
+   !/Staffelkorting/.test(s.spec) && s.totaal.includes(alsTekst(24 * PRIJS.grond.prijs)), s.totaal);
 
 // ---------------- de staffel telt alleen zijn eigen stuks ----------------
 await leeg(); await zet('vast', 20); await zet('struik', 10);
@@ -171,7 +179,7 @@ ok('23 vast: geen kortingsregel', !/Staffelkorting/.test(s.spec), s.spec);
 // Dit is de controle die de vorige versie zou hebben gepakt: daar stond de
 // regel tegen de staffelprijs en de korting er nog eens onder, dus de klant
 // die meerekende kwam 12 euro te laag uit.
-for (const mand of [{vast:24}, {vast:24, struik:2, boom:1}, {vast:30, boom:2}, {struik:3}]) {
+for (const mand of [{vast:24}, {vast:24, struik:2, boom:1, grond:2}, {vast:30, boom:2}, {grond:3}]) {
   await leeg();
   for (const [id, n] of Object.entries(mand)) await zet(id, n);
   const uit = await page.evaluate(() => {
@@ -190,13 +198,15 @@ for (const mand of [{vast:24}, {vast:24, struik:2, boom:1}, {vast:30, boom:2}, {
 }
 
 // ---------------- regeltotalen per kaart ----------------
-await leeg(); await zet('vast', 24); await zet('struik', 2); await zet('boom', 1);
+await leeg(); await zet('vast', 24); await zet('struik', 2); await zet('boom', 1); await zet('grond', 2);
 s = await lees();
 ok('regeltotaal vaste planten 72,00',  s.regels[0].som.includes('72,00'),  s.regels[0].som);
 ok('regeltotaal fruitstruiken '+alsTekst(2*PRIJS.struik.prijs),
    s.regels[1].som.includes(alsTekst(2*PRIJS.struik.prijs)), s.regels[1].som);
 ok('regeltotaal fruitbomen '+alsTekst(PRIJS.boom.prijs),
    s.regels[2].som.includes(alsTekst(PRIJS.boom.prijs)), s.regels[2].som);
+ok('regeltotaal potgrond '+alsTekst(2*PRIJS.grond.prijs),
+   s.regels[3].som.includes(alsTekst(2*PRIJS.grond.prijs)), s.regels[3].som);
 
 // ---------------- knoppen ----------------
 await leeg();
@@ -206,13 +216,35 @@ ok('plus twee keer op fruitbomen => 2', (await veld('boom').inputValue()) === '2
 await page.click('.regel[data-id="boom"] button[data-stap="-1"]');
 ok('min één keer => 1', (await veld('boom').inputValue()) === '1');
 ok('andere regels blijven 0',
-   (await veld('vast').inputValue()) === '0' && (await veld('struik').inputValue()) === '0');
+   ['vast','struik','grond'].every(async () => true) &&
+   (await veld('vast').inputValue()) === '0' &&
+   (await veld('struik').inputValue()) === '0' &&
+   (await veld('grond').inputValue()) === '0');
 await page.click('.regel[data-id="vast"] .regel__snel button[data-zet="24"]');
 s = await lees();
 ok('snelknop 24 raakt alleen de vaste planten',
-   s.regels[0].veld === '24' && s.regels[2].veld === '1', s.regels.map(r=>r.veld).join('/'));
+   s.regels[0].veld === '24' && s.regels[2].veld === '1' && s.regels[3].veld === '0',
+   s.regels.map(r=>r.veld).join('/'));
 ok('  alleen die regel heeft snelknoppen',
    (await page.locator('.regel__snel').count()) === 1);
+
+// ---------------- voorleeslabels ----------------
+const labels = await page.evaluate(() => [...document.querySelectorAll('.regel')].map(r => ({
+  id: r.dataset.id,
+  min: r.querySelector('button[data-stap="-1"]').getAttribute('aria-label'),
+  veld: r.querySelector('.regel__veld').getAttribute('aria-label'),
+})));
+const wilLabels = [
+  ['\u00c9\u00e9n vaste plant minder',  'Aantal vaste planten'],
+  ['\u00c9\u00e9n fruitstruik minder',  'Aantal fruitstruiken'],
+  ['\u00c9\u00e9n fruitboom minder',    'Aantal fruitbomen'],
+  ['\u00c9\u00e9n zak potgrond minder', 'Aantal zakken potgrond'],
+];
+for (const [i, [min, veldLabel]] of wilLabels.entries()) {
+  ok(`voorleeslabel regel ${i+1}: "${min}"`,
+     labels[i].min === min && labels[i].veld === veldLabel,
+     labels[i].min + ' / ' + labels[i].veld);
+}
 
 // ---------------- grenswaarden ----------------
 for (const [in_, uit] of [['1500','999'],['-4','0'],['3.9','3'],['','0']]) {
@@ -256,10 +288,10 @@ for (const w of [320, 360, 390, 768, 1280]) {
 await page.setViewportSize({ width:390, height:844 });
 
 // ---------------- klembord en doorsturen ----------------
-await leeg(); await zet('vast', 24); await zet('struik', 2); await zet('boom', 1);
+await leeg(); await zet('vast', 24); await zet('struik', 2); await zet('boom', 1); await zet('grond', 2);
 await page.click('#afrekenen');
 await page.waitForTimeout(120);
-const wilKlembord = alsTekst(verwachtCenten({vast:24, struik:2, boom:1}));
+const wilKlembord = alsTekst(verwachtCenten({vast:24, struik:2, boom:1, grond:2}));
 ok('klembord bevat '+wilKlembord,
    (await page.evaluate(() => navigator.clipboard.readText())) === wilKlembord,
    JSON.stringify(await page.evaluate(() => navigator.clipboard.readText())));
@@ -343,7 +375,7 @@ ok('geen console-fouten', echteFouten.length === 0, echteFouten.join(' | '));
 ok('geen mislukte requests', badreq.length === 0, badreq.join(' | '));
 
 await page.setViewportSize({ width:390, height:844 });
-await leeg(); await zet('vast', 24); await zet('struik', 2); await zet('boom', 1);
+await leeg(); await zet('vast', 24); await zet('struik', 2); await zet('boom', 1); await zet('grond', 2);
 await page.screenshot({ path: path.join(ROOT, '.kassa-390.png'), fullPage:true });
 
 await browser.close(); srv.close();

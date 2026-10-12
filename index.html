@@ -159,10 +159,17 @@ h1 em{font-style:italic;color:var(--dark)}
 
 const WINKEL = {
   producten: [
+    /* 'een' en 'veel' zijn alleen voor de voorleessoftware: zonder die twee
+       staat er 'Een vaste planten minder', en dat is geen zin. */
     { id: 'vast',   naam: 'Vaste planten', pot: '9 cm pot',     prijs: 350,
+      een: 'vaste plant', veel: 'vaste planten',
       staffelVanaf: 24, staffelPrijs: 300, snel: [6, 12, 24, 48] },
-    { id: 'struik', naam: 'Fruitstruiken', pot: '15 cm pot',    prijs: 800 },
-    { id: 'boom',   naam: 'Fruitbomen',    pot: '11 liter pot', prijs: 1995 },
+    { id: 'struik', naam: 'Fruitstruiken', pot: '15 cm pot',    prijs: 800,
+      een: 'fruitstruik', veel: 'fruitstruiken' },
+    { id: 'boom',   naam: 'Fruitbomen',    pot: '11 liter pot', prijs: 1995,
+      een: 'fruitboom', veel: 'fruitbomen' },
+    { id: 'grond',  naam: 'Veenvrije bio potgrond', pot: 'per zak', prijs: 800,
+      een: 'zak potgrond', veel: 'zakken potgrond' },
   ],
 
   /* De Mollie-betaallink met OPEN BEDRAG. De klant plakt of typt het totaal.
@@ -197,6 +204,9 @@ for (const p of WINKEL.producten) {
   kaart.className = 'regel';
   kaart.dataset.id = p.id;
 
+  const een  = p.een  || p.naam.toLowerCase();
+  const veel = p.veel || p.naam.toLowerCase();
+
   const staffelregel = p.staffelVanaf
     ? '<small>' + bedrag(p.staffelPrijs) + ' vanaf ' + p.staffelVanaf + '</small>' : '';
   const snelknoppen = p.snel
@@ -216,11 +226,11 @@ for (const p of WINKEL.producten) {
     '</div>' +
     '<div class="regel__rij">' +
       '<button class="regel__knop" type="button" data-stap="-1" ' +
-        'aria-label="Een ' + p.naam.toLowerCase() + ' minder">&minus;</button>' +
+        'aria-label="\u00c9\u00e9n ' + een + ' minder">&minus;</button>' +
       '<input class="regel__veld num" type="number" inputmode="numeric" min="0" ' +
-        'max="' + WINKEL.max + '" step="1" value="0" aria-label="Aantal ' + p.naam.toLowerCase() + '">' +
+        'max="' + WINKEL.max + '" step="1" value="0" aria-label="Aantal ' + veel + '">' +
       '<button class="regel__knop" type="button" data-stap="1" ' +
-        'aria-label="Een ' + p.naam.toLowerCase() + ' meer">+</button>' +
+        'aria-label="\u00c9\u00e9n ' + een + ' meer">+</button>' +
       '<span class="regel__som num regel__som--nul">' + bedrag(0) + '</span>' +
     '</div>' + snelknoppen + meter;
 

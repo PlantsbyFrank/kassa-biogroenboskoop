@@ -52,6 +52,10 @@ gehouden moet worden:
   `index.html` en bouwt de regels daaruit op, dus een product erbij is een
   regel erbij.
 
+  Een product kent naast zijn prijs een enkelvoud en een meervoud (`een` en
+  `veel`). Die zijn alleen voor de voorleessoftware: zonder die twee zegt de
+  minknop "Een vaste planten minder".
+
   Een prijs wijzigen kost **twee** plekken: `WINKEL` in `index.html` en de
   tabel `PRIJS` bovenin `test-kassa.mjs`. Dat is met opzet. Zou de test de
   prijzen uit de pagina lezen, dan controleert hij alleen of de pagina het met
